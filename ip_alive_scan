@@ -1,1 +1,14 @@
+# ip_alive_scan.py
 
+from re import VERBOSE
+from scapy.all import *
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
+for i in range(1,255):
+    dst = f"10.9.69.{i}" # 前边为 所需扫描网段IP
+    print(f"\r[+] Test:{dst}", end = "")
+    pkt = IP(src = '0.0.0.0',dst = dst)/ICMP() #0.0.0.0 = localhost IP
+    res = sr1(pkt, timeout = 0.1, verbose = False)
+    if res and res.code == 0:
+        print(f"\n[+] {dst} is alive")
